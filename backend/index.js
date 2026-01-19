@@ -121,3 +121,16 @@ app.get('/notifications', (req, res) => {
 
 const PORT = 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Seasonal demand simulation (TASK 4)
+app.get('/seasonal-demand', (req, res) => {
+  // simulate heavy computation
+  let sum = 0;
+  for (let i = 0; i < 5e7; i++) {
+    sum += i;
+  }
+  res.json({
+    message: 'Seasonal demand data processed',
+    loadSimulation: 'HIGH',
+    timestamp: new Date().toISOString()
+  });
+});
