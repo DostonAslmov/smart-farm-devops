@@ -1,0 +1,12 @@
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "3000:3000"
+    environment:
+      - DATA_DIR=/data
+    volumes:
+      - backend_data:/data
+
+volumes:
+  backend_data:
