@@ -134,3 +134,46 @@ app.get('/seasonal-demand', (req, res) => {
     timestamp: new Date().toISOString()
   });
 });
+// KPI + Daily reporting (TASK 5)
+const REPORT_DIR = process.env.REPORT_DIR || path.join(DATA_DIR, 'reports');
+
+function ensureReportDir() {
+  ensureDataDir();
+  if (!fs.existsSync(REPORT_DIR)) fs.mkdirSync(REPORT_DIR, { recursive: true });
+}
+
+app.get('/kpi', (req, res) => {
+  const kpi = {
+    timestamp: new Date().toISOString(),
+    productsCount: products.length,
+    ordersCount: orders.length,
+    priceChangesCount: priceHistory.length
+  };
+  res.json(kpi);
+});
+
+app.post('/generate-daily-report', (req, res) => {
+  ensureReportDir();
+  const today = new Date().toISOString().slice(0, 10);
+  const report = {
+    date: today,
+    generatedAt: new Date().toISOString(),
+    kpi: {
+      productsCount: products.length,
+      ordersCount: orders.length,
+      priceChangesCount: priceHistory.length
+    },
+    notes: "Auto-generated daily summary for continuous improvement."
+  };
+
+  const filePath = path.join(REPORT_DIR, `daily-report-${today}.json`);
+  fs.writeFileSync(filePath, JSON.stringify(report, null, 2), 'utf8');
+
+  res.json({ message: 'Daily report generated', file: filePath, report });
+});
+
+app.get('/daily-reports', (req, res) => {
+  ensureReportDir();
+  const files = fs.readdirSync(REPORT_DIR).filter(f => f.startsWith('daily-report-'));
+  res.json({ files });
+});
